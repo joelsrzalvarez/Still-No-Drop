@@ -18,6 +18,15 @@ MorpherFrame.title = MorpherFrame:CreateFontString(nil, "OVERLAY", "GameFontHigh
 MorpherFrame.title:SetPoint("TOP", MorpherFrame, "TOP", 0, -10)
 MorpherFrame.title:SetText("Morpher")
 
+local CloseButton = CreateFrame("Button", "CloseButton", MorpherFrame, "UIPanelButtonTemplate")
+CloseButton:SetSize(25, 25) 
+CloseButton:SetPoint("TOPRIGHT", MorpherFrame, "TOPRIGHT", -10, -10) 
+CloseButton:SetText("X") 
+
+CloseButton:SetScript("OnClick", function()
+    MorpherFrame:Hide()
+end)
+
 local VersionsBox = CreateFrame("Frame", "VersionsBox", MorpherFrame)
 VersionsBox:SetSize(200, 560)
 VersionsBox:SetPoint("TOPLEFT", MorpherFrame, "TOPLEFT", 10, -30)
@@ -41,7 +50,7 @@ GearBox:SetBackdrop({
     insets = { left = 6, right = 6, top = 6, bottom = 6 }
 })
 
-local versions = {"Classic", "TBC", "WotLK"}  
+local versions = {"Classic", "TBC", "WotLK"} 
 for i, version in ipairs(versions) do
     local button = CreateFrame("Button", "VersionButton" .. i, VersionsBox, "UIPanelButtonTemplate")
     button:SetSize(180, 40)
@@ -57,14 +66,17 @@ for i, version in ipairs(versions) do
     button:SetScript("OnClick", function(self)
         for _, v in ipairs(versions) do
             local btn = _G["VersionButton" .. _]
-            btn:SetBackdropColor(0, 0, 0, 0)
+            btn:SetBackdropColor(0, 0, 0, 0) 
         end
 
-        self:SetBackdropColor(0.5, 0.5, 0.5, 1)
+        self:SetBackdropColor(0.5, 0.5, 0.5, 1)  
+        
         lastSelectedButton = self
+
         ShowGearForVersion(version)
     end)
 end
 
 MorpherFrame:Hide()
+
 _G["MorpherFrame"] = MorpherFrame
