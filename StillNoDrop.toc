@@ -6,4 +6,5 @@
 ## SavedVariables: SND_DB
 
 StillNoDrop.lua
+StillNoDrop_Logic.lua
 StillNoDrop_UI.lua
