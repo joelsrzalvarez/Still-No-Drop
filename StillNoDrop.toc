@@ -1,0 +1,9 @@
+## Interface: 30400
+## Title: Still No Drop
+## Notes: Track your farming attempts for mounts and rare drops
+## Author: Ferssie
+## Version: 1.0
+## SavedVariables: SND_DB
+
+StillNoDrop.lua
+StillNoDrop_UI.lua
