@@ -16,7 +16,7 @@ end
 
 function SND:CreateUI()
     SND_Frame = CreateFrame("Frame", "SND_Frame", UIParent)
-    SND_Frame:SetSize(600, 600)
+    SND_Frame:SetSize(650, 500)
     SND_Frame:SetPoint("CENTER")
     SND_Frame:SetMovable(true)
     SND_Frame:EnableMouse(true)
@@ -34,6 +34,7 @@ function SND:CreateUI()
     SND_Frame:SetBackdropColor(0, 0, 0, 1)
     SND_Frame:SetBackdropBorderColor(1, 1, 1, 1)
     SND_Frame.title = SND_Frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+
     SND_Frame.title:SetPoint("TOP", SND_Frame, "TOP", 0, -10)
     SND_Frame.title:SetText("Still No Drop")
     SND_Frame.separator = SND_Frame:CreateTexture(nil, "ARTWORK")
@@ -56,17 +57,20 @@ function SND:CreateUI()
     SND_Frame.okButton:SetPoint("LEFT", SND_Frame.newRunEditBox, "RIGHT", 10, 0)
     SND_Frame.okButton:SetText("OK")
     SND_Frame.tableHeaderTop = SND_Frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    SND_Frame.tableHeaderTop:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", 30, -120)
-    SND_Frame.tableHeaderTop:SetText("Top")
+    SND_Frame.tableHeaderTop = SND_Frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     SND_Frame.tableHeaderName = SND_Frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    SND_Frame.tableHeaderName:SetPoint("LEFT", SND_Frame.tableHeaderTop, "LEFT", 40, 0)
-    SND_Frame.tableHeaderName:SetText("Name")
     SND_Frame.tableHeaderAttempts = SND_Frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    SND_Frame.tableHeaderAttempts:SetPoint("LEFT", SND_Frame.tableHeaderName, "LEFT", 180, 0)
-    SND_Frame.tableHeaderAttempts:SetText("Attempts")
     SND_Frame.tableHeaderActions = SND_Frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    SND_Frame.tableHeaderActions:SetPoint("LEFT", SND_Frame.tableHeaderAttempts, "LEFT", 90, 0)
+
+    SND_Frame.tableHeaderTop:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", 40, -120)
+    SND_Frame.tableHeaderTop:SetText("Top")
+    SND_Frame.tableHeaderName:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", 80, -120)
+    SND_Frame.tableHeaderName:SetText("Name")
+    SND_Frame.tableHeaderAttempts:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", 270, -120)
+    SND_Frame.tableHeaderAttempts:SetText("Attempts")
+    SND_Frame.tableHeaderActions:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", 360, -120)
     SND_Frame.tableHeaderActions:SetText("Actions")
+
     SND_Frame.runsList = {}
     SND_Frame.okButton:SetScript("OnClick", function()
         local runName = SND_Frame.newRunEditBox:GetText()
@@ -98,43 +102,54 @@ function SND:UpdateRunsList()
         if row.report then row.report:Hide() end
         if row.gotit then row.gotit:Hide() end
     end
+
     for i, runName in ipairs(runs) do
+        local y = -120 - i * 32 -- Separación vertical un poco mayor para más claridad
+        -- POSICIONES PARA COLUMNAS (ajustadas a 650px)
+        local xTop     = 40
+        local xName    = 80
+        local xAttempts= 270
+        local xInc     = 370
+        local xDec     = 402
+        local xDel     = 434
+        local xReport  = 500
+        local xGotIt   = 570
+
         if not SND_Frame.rows[i] then
             SND_Frame.rows[i] = {}
-            local y = -120 - i * 30
             SND_Frame.rows[i].top = SND_Frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-            SND_Frame.rows[i].top:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", 30, y)
             SND_Frame.rows[i].name = SND_Frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-            SND_Frame.rows[i].name:SetPoint("LEFT", SND_Frame.rows[i].top, "LEFT", 40, 0)
             SND_Frame.rows[i].attempts = SND_Frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-            SND_Frame.rows[i].attempts:SetPoint("LEFT", SND_Frame.rows[i].name, "LEFT", 180, 0)
             SND_Frame.rows[i].inc = CreateFrame("Button", nil, SND_Frame, "UIPanelButtonTemplate")
-            SND_Frame.rows[i].inc:SetSize(22, 22)
-            SND_Frame.rows[i].inc:SetPoint("LEFT", SND_Frame.rows[i].attempts, "LEFT", 60, 0)
+            SND_Frame.rows[i].inc:SetSize(26, 22)
             SND_Frame.rows[i].inc:SetText("+")
             SND_Frame.rows[i].dec = CreateFrame("Button", nil, SND_Frame, "UIPanelButtonTemplate")
-            SND_Frame.rows[i].dec:SetSize(22, 22)
-            SND_Frame.rows[i].dec:SetPoint("LEFT", SND_Frame.rows[i].inc, "RIGHT", 2, 0)
+            SND_Frame.rows[i].dec:SetSize(26, 22)
             SND_Frame.rows[i].dec:SetText("-")
             SND_Frame.rows[i].del = CreateFrame("Button", nil, SND_Frame, "UIPanelButtonTemplate")
-            SND_Frame.rows[i].del:SetSize(40, 22)
-            SND_Frame.rows[i].del:SetPoint("LEFT", SND_Frame.rows[i].dec, "RIGHT", 2, 0)
+            SND_Frame.rows[i].del:SetSize(50, 22)
             SND_Frame.rows[i].del:SetText("Delete")
             SND_Frame.rows[i].report = CreateFrame("Button", nil, SND_Frame, "UIPanelButtonTemplate")
-            SND_Frame.rows[i].report:SetSize(50, 22)
-            SND_Frame.rows[i].report:SetPoint("LEFT", SND_Frame.rows[i].del, "RIGHT", 2, 0)
+            SND_Frame.rows[i].report:SetSize(55, 22)
             SND_Frame.rows[i].report:SetText("Report")
             SND_Frame.rows[i].gotit = CreateFrame("Button", nil, SND_Frame, "UIPanelButtonTemplate")
-            SND_Frame.rows[i].gotit:SetSize(50, 22)
-            SND_Frame.rows[i].gotit:SetPoint("LEFT", SND_Frame.rows[i].report, "RIGHT", 2, 0)
+            SND_Frame.rows[i].gotit:SetSize(60, 22)
             SND_Frame.rows[i].gotit:SetText("Got it!")
         end
-        local y = -120 - i * 30
-        SND_Frame.rows[i].top:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", 30, y)
+
+        SND_Frame.rows[i].top:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xTop, y)
+        SND_Frame.rows[i].name:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xName, y)
+        SND_Frame.rows[i].attempts:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xAttempts, y)
+        SND_Frame.rows[i].inc:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xInc, y)
+        SND_Frame.rows[i].dec:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xDec, y)
+        SND_Frame.rows[i].del:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xDel, y)
+        SND_Frame.rows[i].report:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xReport, y)
+        SND_Frame.rows[i].gotit:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xGotIt, y)
+
         SND_Frame.rows[i].top:SetText(i)
         SND_Frame.rows[i].top:Show()
         if SND_DB[runName].gotit then
-            SND_Frame.rows[i].name:SetText("|cff00ff00" .. runName .. " (Got it!)|r")
+            SND_Frame.rows[i].name:SetText("|cff00ff00" .. runName .. "|r")
         else
             SND_Frame.rows[i].name:SetText(runName)
         end
@@ -146,6 +161,17 @@ function SND:UpdateRunsList()
         SND_Frame.rows[i].del:Show()
         SND_Frame.rows[i].report:Show()
         SND_Frame.rows[i].gotit:Show()
+
+        if SND_DB[runName].gotit then
+            SND_Frame.rows[i].inc:Disable()
+            SND_Frame.rows[i].dec:Disable()
+            SND_Frame.rows[i].gotit:Disable()
+        else
+            SND_Frame.rows[i].inc:Enable()
+            SND_Frame.rows[i].dec:Enable()
+            SND_Frame.rows[i].gotit:Enable()
+        end
+
         SND_Frame.rows[i].inc:SetScript("OnClick", function()
             SND_DB[runName].attempts = (SND_DB[runName].attempts or 0) + 1
             SND:UpdateRunsList()
@@ -160,7 +186,11 @@ function SND:UpdateRunsList()
         end)
         SND_Frame.rows[i].report:SetScript("OnClick", function()
             local count = SND_DB[runName].attempts or 0
-            SendChatMessage("I have #" .. count .. " attempts on " .. runName .. " and still no drop :(", "SAY")
+            if SND_DB[runName].gotit then
+                SendChatMessage("!!! I got my " .. runName .. " at attempt #" .. count .. " :DD !!!", "SAY")
+            else
+                SendChatMessage("I have #" .. count .. " attempts on " .. runName .. " and still no luck :(", "SAY")
+            end
         end)
         SND_Frame.rows[i].gotit:SetScript("OnClick", function()
             SND_DB[runName].gotit = true
@@ -169,3 +199,4 @@ function SND:UpdateRunsList()
         end)
     end
 end
+
