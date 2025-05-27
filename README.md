@@ -4,11 +4,14 @@
 
 ## Features
 
-- Easily add and manage a list of “runs” or targets you’re farming for
-- Input new runs with a custom name, right in the addon’s interface
-- Displays a numbered list of all your saved runs
-- Data is automatically saved between sessions using WoW’s SavedVariables system
-- Clean, minimalist UI with an easy-to-use slash command
+- Easily add and manage a list of “runs” (targets you’re farming for), with custom names.
+- Track your attempts for rare mount and item drops by incrementing or decrementing counts.
+- Mark a run as completed (“Got it!”), which highlights the row in green and disables further changes.
+- Report your farming progress to chat with a single click.
+- Displays a clear, numbered list of all your saved runs.
+- Pagination: Only 10 runs are shown per page; use navigation buttons to switch pages.
+- Data is automatically saved between sessions using WoW’s SavedVariables system.
+- Clean, minimalist UI with an easy-to-use slash command (/snd).
 
 ## Installation
 
@@ -29,6 +32,8 @@
 
 ## How does it save your data?
 
-Still No Drop uses WoW’s built-in `SavedVariables` feature to store your runs.  
-All your run names are saved in a file:
-J
+Still No Drop uses WoW’s built-in `SavedVariables` feature to store your runs.
+
+### Pagination
+
+If you are tracking more than 10 runs, the addon will automatically split them into pages. Use the navigation buttons at the bottom to switch between pages and view all your runs. Each page shows up to 10 runs.
