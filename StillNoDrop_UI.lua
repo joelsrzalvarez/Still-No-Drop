@@ -1,5 +1,8 @@
 if not SND then SND = {} end
 
+SND.ITEMS_PER_PAGE = 10
+SND.currentPage = 1
+
 function SND:ToggleUI()
     if not SND_Frame then
         self:CreateUI()
@@ -16,7 +19,7 @@ end
 
 function SND:CreateUI()
     SND_Frame = CreateFrame("Frame", "SND_Frame", UIParent)
-    SND_Frame:SetSize(650, 500)
+    SND_Frame:SetSize(650, 525)
     SND_Frame:SetPoint("CENTER")
     SND_Frame:SetMovable(true)
     SND_Frame:EnableMouse(true)
@@ -57,7 +60,6 @@ function SND:CreateUI()
     SND_Frame.okButton:SetPoint("LEFT", SND_Frame.newRunEditBox, "RIGHT", 10, 0)
     SND_Frame.okButton:SetText("OK")
     SND_Frame.tableHeaderTop = SND_Frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    SND_Frame.tableHeaderTop = SND_Frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     SND_Frame.tableHeaderName = SND_Frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     SND_Frame.tableHeaderAttempts = SND_Frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     SND_Frame.tableHeaderActions = SND_Frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
@@ -92,6 +94,13 @@ end
 function SND:UpdateRunsList()
     if not SND_Frame.rows then SND_Frame.rows = {} end
     local runs = SND:GetRuns()
+    local totalPages = math.ceil(#runs / SND.ITEMS_PER_PAGE)
+    if SND.currentPage > totalPages then SND.currentPage = totalPages end
+    if SND.currentPage < 1 then SND.currentPage = 1 end
+
+    local startIdx = (SND.currentPage - 1) * SND.ITEMS_PER_PAGE + 1
+    local endIdx = math.min(startIdx + SND.ITEMS_PER_PAGE - 1, #runs)
+
     for i, row in ipairs(SND_Frame.rows) do
         row.top:Hide()
         row.name:Hide()
@@ -103,88 +112,83 @@ function SND:UpdateRunsList()
         if row.gotit then row.gotit:Hide() end
     end
 
-    for i, runName in ipairs(runs) do
-        local y = -120 - i * 32 -- Separación vertical un poco mayor para más claridad
-        -- POSICIONES PARA COLUMNAS (ajustadas a 650px)
-        local xTop     = 40
-        local xName    = 80
-        local xAttempts= 270
-        local xInc     = 370
-        local xDec     = 402
-        local xDel     = 434
-        local xReport  = 500
-        local xGotIt   = 570
+    local visualRow = 1
+    for idx = startIdx, endIdx do
+        local runName = runs[idx]
+        local y = -120 - visualRow * 32
+        local xTop, xName, xAttempts, xInc, xDec, xDel, xReport, xGotIt =
+            40, 80, 270, 370, 402, 434, 500, 570
 
-        if not SND_Frame.rows[i] then
-            SND_Frame.rows[i] = {}
-            SND_Frame.rows[i].top = SND_Frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-            SND_Frame.rows[i].name = SND_Frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-            SND_Frame.rows[i].attempts = SND_Frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-            SND_Frame.rows[i].inc = CreateFrame("Button", nil, SND_Frame, "UIPanelButtonTemplate")
-            SND_Frame.rows[i].inc:SetSize(26, 22)
-            SND_Frame.rows[i].inc:SetText("+")
-            SND_Frame.rows[i].dec = CreateFrame("Button", nil, SND_Frame, "UIPanelButtonTemplate")
-            SND_Frame.rows[i].dec:SetSize(26, 22)
-            SND_Frame.rows[i].dec:SetText("-")
-            SND_Frame.rows[i].del = CreateFrame("Button", nil, SND_Frame, "UIPanelButtonTemplate")
-            SND_Frame.rows[i].del:SetSize(50, 22)
-            SND_Frame.rows[i].del:SetText("Delete")
-            SND_Frame.rows[i].report = CreateFrame("Button", nil, SND_Frame, "UIPanelButtonTemplate")
-            SND_Frame.rows[i].report:SetSize(55, 22)
-            SND_Frame.rows[i].report:SetText("Report")
-            SND_Frame.rows[i].gotit = CreateFrame("Button", nil, SND_Frame, "UIPanelButtonTemplate")
-            SND_Frame.rows[i].gotit:SetSize(60, 22)
-            SND_Frame.rows[i].gotit:SetText("Got it!")
+        if not SND_Frame.rows[visualRow] then
+            SND_Frame.rows[visualRow] = {}
+            SND_Frame.rows[visualRow].top = SND_Frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+            SND_Frame.rows[visualRow].name = SND_Frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+            SND_Frame.rows[visualRow].attempts = SND_Frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+            SND_Frame.rows[visualRow].inc = CreateFrame("Button", nil, SND_Frame, "UIPanelButtonTemplate")
+            SND_Frame.rows[visualRow].inc:SetSize(26, 22)
+            SND_Frame.rows[visualRow].inc:SetText("+")
+            SND_Frame.rows[visualRow].dec = CreateFrame("Button", nil, SND_Frame, "UIPanelButtonTemplate")
+            SND_Frame.rows[visualRow].dec:SetSize(26, 22)
+            SND_Frame.rows[visualRow].dec:SetText("-")
+            SND_Frame.rows[visualRow].del = CreateFrame("Button", nil, SND_Frame, "UIPanelButtonTemplate")
+            SND_Frame.rows[visualRow].del:SetSize(50, 22)
+            SND_Frame.rows[visualRow].del:SetText("Delete")
+            SND_Frame.rows[visualRow].report = CreateFrame("Button", nil, SND_Frame, "UIPanelButtonTemplate")
+            SND_Frame.rows[visualRow].report:SetSize(55, 22)
+            SND_Frame.rows[visualRow].report:SetText("Report")
+            SND_Frame.rows[visualRow].gotit = CreateFrame("Button", nil, SND_Frame, "UIPanelButtonTemplate")
+            SND_Frame.rows[visualRow].gotit:SetSize(60, 22)
+            SND_Frame.rows[visualRow].gotit:SetText("Got it!")
         end
 
-        SND_Frame.rows[i].top:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xTop, y)
-        SND_Frame.rows[i].name:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xName, y)
-        SND_Frame.rows[i].attempts:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xAttempts, y)
-        SND_Frame.rows[i].inc:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xInc, y)
-        SND_Frame.rows[i].dec:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xDec, y)
-        SND_Frame.rows[i].del:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xDel, y)
-        SND_Frame.rows[i].report:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xReport, y)
-        SND_Frame.rows[i].gotit:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xGotIt, y)
+        SND_Frame.rows[visualRow].top:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xTop, y)
+        SND_Frame.rows[visualRow].name:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xName, y)
+        SND_Frame.rows[visualRow].attempts:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xAttempts, y)
+        SND_Frame.rows[visualRow].inc:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xInc, y)
+        SND_Frame.rows[visualRow].dec:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xDec, y)
+        SND_Frame.rows[visualRow].del:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xDel, y)
+        SND_Frame.rows[visualRow].report:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xReport, y)
+        SND_Frame.rows[visualRow].gotit:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", xGotIt, y)
 
-        SND_Frame.rows[i].top:SetText(i)
-        SND_Frame.rows[i].top:Show()
+        SND_Frame.rows[visualRow].top:SetText(idx)
+        SND_Frame.rows[visualRow].top:Show()
         if SND_DB[runName].gotit then
-            SND_Frame.rows[i].name:SetText("|cff00ff00" .. runName .. "|r")
+            SND_Frame.rows[visualRow].name:SetText("|cff00ff00" .. runName .. "|r")
         else
-            SND_Frame.rows[i].name:SetText(runName)
+            SND_Frame.rows[visualRow].name:SetText(runName)
         end
-        SND_Frame.rows[i].name:Show()
-        SND_Frame.rows[i].attempts:SetText(SND_DB[runName].attempts or 0)
-        SND_Frame.rows[i].attempts:Show()
-        SND_Frame.rows[i].inc:Show()
-        SND_Frame.rows[i].dec:Show()
-        SND_Frame.rows[i].del:Show()
-        SND_Frame.rows[i].report:Show()
-        SND_Frame.rows[i].gotit:Show()
+        SND_Frame.rows[visualRow].name:Show()
+        SND_Frame.rows[visualRow].attempts:SetText(SND_DB[runName].attempts or 0)
+        SND_Frame.rows[visualRow].attempts:Show()
+        SND_Frame.rows[visualRow].inc:Show()
+        SND_Frame.rows[visualRow].dec:Show()
+        SND_Frame.rows[visualRow].del:Show()
+        SND_Frame.rows[visualRow].report:Show()
+        SND_Frame.rows[visualRow].gotit:Show()
 
         if SND_DB[runName].gotit then
-            SND_Frame.rows[i].inc:Disable()
-            SND_Frame.rows[i].dec:Disable()
-            SND_Frame.rows[i].gotit:Disable()
+            SND_Frame.rows[visualRow].inc:Disable()
+            SND_Frame.rows[visualRow].dec:Disable()
+            SND_Frame.rows[visualRow].gotit:Disable()
         else
-            SND_Frame.rows[i].inc:Enable()
-            SND_Frame.rows[i].dec:Enable()
-            SND_Frame.rows[i].gotit:Enable()
+            SND_Frame.rows[visualRow].inc:Enable()
+            SND_Frame.rows[visualRow].dec:Enable()
+            SND_Frame.rows[visualRow].gotit:Enable()
         end
 
-        SND_Frame.rows[i].inc:SetScript("OnClick", function()
+        SND_Frame.rows[visualRow].inc:SetScript("OnClick", function()
             SND_DB[runName].attempts = (SND_DB[runName].attempts or 0) + 1
             SND:UpdateRunsList()
         end)
-        SND_Frame.rows[i].dec:SetScript("OnClick", function()
+        SND_Frame.rows[visualRow].dec:SetScript("OnClick", function()
             SND_DB[runName].attempts = math.max(0, (SND_DB[runName].attempts or 0) - 1)
             SND:UpdateRunsList()
         end)
-        SND_Frame.rows[i].del:SetScript("OnClick", function()
+        SND_Frame.rows[visualRow].del:SetScript("OnClick", function()
             SND_DB[runName] = nil
             SND:UpdateRunsList()
         end)
-        SND_Frame.rows[i].report:SetScript("OnClick", function()
+        SND_Frame.rows[visualRow].report:SetScript("OnClick", function()
             local count = SND_DB[runName].attempts or 0
             if SND_DB[runName].gotit then
                 SendChatMessage("!!! I got my " .. runName .. " at attempt #" .. count .. " :DD !!!", "SAY")
@@ -192,11 +196,44 @@ function SND:UpdateRunsList()
                 SendChatMessage("I have #" .. count .. " attempts on " .. runName .. " and still no luck :(", "SAY")
             end
         end)
-        SND_Frame.rows[i].gotit:SetScript("OnClick", function()
+        SND_Frame.rows[visualRow].gotit:SetScript("OnClick", function()
             SND_DB[runName].gotit = true
             print("|cffffff00[Still No Drop]|r Congratulations! You got: " .. runName)
             SND:UpdateRunsList()
         end)
+        visualRow = visualRow + 1
+    end
+
+    if SND_Frame.paginationButtons then
+        for _, btn in ipairs(SND_Frame.paginationButtons) do
+            btn:Hide()
+        end
+    else
+        SND_Frame.paginationButtons = {}
+    end
+
+    local paginationY = -120 - (SND.ITEMS_PER_PAGE + 1) * 32
+    local buttonX = 200
+    local spaceX = 35
+
+    for p = 1, totalPages do
+        if not SND_Frame.paginationButtons[p] then
+            SND_Frame.paginationButtons[p] = CreateFrame("Button", nil, SND_Frame, "UIPanelButtonTemplate")
+            SND_Frame.paginationButtons[p]:SetSize(30, 22)
+        end
+        SND_Frame.paginationButtons[p]:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", buttonX + (p-1)*spaceX, paginationY)
+        SND_Frame.paginationButtons[p]:SetText(p)
+        SND_Frame.paginationButtons[p]:Show()
+        if p == SND.currentPage then
+            SND_Frame.paginationButtons[p]:Disable()
+        else
+            SND_Frame.paginationButtons[p]:Enable()
+            SND_Frame.paginationButtons[p]:SetScript("OnClick", function()
+                SND.currentPage = p
+                SND:UpdateRunsList()
+            end)
+        end
     end
 end
+
 
