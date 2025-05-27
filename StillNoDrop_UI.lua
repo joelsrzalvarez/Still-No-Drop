@@ -95,6 +95,8 @@ function SND:UpdateRunsList()
         row.inc:Hide()
         row.dec:Hide()
         row.del:Hide()
+        if row.report then row.report:Hide() end
+        if row.gotit then row.gotit:Hide() end
     end
     for i, runName in ipairs(runs) do
         if not SND_Frame.rows[i] then
@@ -118,18 +120,32 @@ function SND:UpdateRunsList()
             SND_Frame.rows[i].del:SetSize(40, 22)
             SND_Frame.rows[i].del:SetPoint("LEFT", SND_Frame.rows[i].dec, "RIGHT", 2, 0)
             SND_Frame.rows[i].del:SetText("Delete")
+            SND_Frame.rows[i].report = CreateFrame("Button", nil, SND_Frame, "UIPanelButtonTemplate")
+            SND_Frame.rows[i].report:SetSize(50, 22)
+            SND_Frame.rows[i].report:SetPoint("LEFT", SND_Frame.rows[i].del, "RIGHT", 2, 0)
+            SND_Frame.rows[i].report:SetText("Report")
+            SND_Frame.rows[i].gotit = CreateFrame("Button", nil, SND_Frame, "UIPanelButtonTemplate")
+            SND_Frame.rows[i].gotit:SetSize(50, 22)
+            SND_Frame.rows[i].gotit:SetPoint("LEFT", SND_Frame.rows[i].report, "RIGHT", 2, 0)
+            SND_Frame.rows[i].gotit:SetText("Got it!")
         end
         local y = -120 - i * 30
         SND_Frame.rows[i].top:SetPoint("TOPLEFT", SND_Frame, "TOPLEFT", 30, y)
         SND_Frame.rows[i].top:SetText(i)
         SND_Frame.rows[i].top:Show()
-        SND_Frame.rows[i].name:SetText(runName)
+        if SND_DB[runName].gotit then
+            SND_Frame.rows[i].name:SetText("|cff00ff00" .. runName .. " (Got it!)|r")
+        else
+            SND_Frame.rows[i].name:SetText(runName)
+        end
         SND_Frame.rows[i].name:Show()
         SND_Frame.rows[i].attempts:SetText(SND_DB[runName].attempts or 0)
         SND_Frame.rows[i].attempts:Show()
         SND_Frame.rows[i].inc:Show()
         SND_Frame.rows[i].dec:Show()
         SND_Frame.rows[i].del:Show()
+        SND_Frame.rows[i].report:Show()
+        SND_Frame.rows[i].gotit:Show()
         SND_Frame.rows[i].inc:SetScript("OnClick", function()
             SND_DB[runName].attempts = (SND_DB[runName].attempts or 0) + 1
             SND:UpdateRunsList()
@@ -140,6 +156,15 @@ function SND:UpdateRunsList()
         end)
         SND_Frame.rows[i].del:SetScript("OnClick", function()
             SND_DB[runName] = nil
+            SND:UpdateRunsList()
+        end)
+        SND_Frame.rows[i].report:SetScript("OnClick", function()
+            local count = SND_DB[runName].attempts or 0
+            SendChatMessage("I have #" .. count .. " attempts on " .. runName .. " and still no drop :(", "SAY")
+        end)
+        SND_Frame.rows[i].gotit:SetScript("OnClick", function()
+            SND_DB[runName].gotit = true
+            print("|cffffff00[Still No Drop]|r Congratulations! You got: " .. runName)
             SND:UpdateRunsList()
         end)
     end
