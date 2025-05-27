@@ -17,8 +17,14 @@ end
 function SND:GetRuns()
     local runs = {}
     for runName, data in pairs(SND_DB) do
-        table.insert(runs, runName)
+        table.insert(runs, {name = runName, attempts = data.attempts or 0})
     end
-    table.sort(runs)
-    return runs
+    table.sort(runs, function(a, b)
+        return a.attempts > b.attempts
+    end)
+    local orderedNames = {}
+    for i, v in ipairs(runs) do
+        table.insert(orderedNames, v.name)
+    end
+    return orderedNames
 end
